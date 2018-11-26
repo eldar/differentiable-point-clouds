@@ -1,0 +1,15 @@
+The code is written by Eldar Insafutdinov with the exception of the following modules:
+
+dpc/densify
+The code for the dense sampling of points from ShapeNet CAD models is authored by Chen-Hsuan Lin
+
+dpc/render/
+The code for rendering point clouds is authored by Maxim Tatarchenko and Eldar Insafutdinov
+
+dpc/util/quaternion.py
+TensorFlow implementation of quaternion operations is authored by Philipp Jund and Eldar Insafutdinov,
+original implementation can be found here: https://github.com/PhilJd/tf-quaternion
+
+dpc/util/quaternion_average.py
+This is a port of Matlab code by Tolga Birdal, see https://github.com/tolgabirdal/averaging_quaternions
+

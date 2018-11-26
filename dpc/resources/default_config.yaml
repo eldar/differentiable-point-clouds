@@ -1,0 +1,185 @@
+# Parameters for the config files and command-line arguments.
+# Default values define the type of the parameter.
+
+config: "" # .yaml config file
+
+inp_dir: ""  # Directory path containing the input data (tfrecords).
+dataset_name: "shapenet_single_category"  # Dataset name that is to be used for training and evaluation.
+synth_set: "03001627"  # Class of Shapenet data
+num_views: 5  # Number of viewpoints in the input data.
+num_views_to_use: -1  # Num of views to actually use.
+tfrecords_gzip_compressed: true  # Compress TF record files.
+image_size: 128  # Input images dimension (pixels) - width & height.
+saved_camera: true
+saved_depth: false
+saved_voxels: false
+
+# Model general
+encoder_name: "img_encoder"  # Name of the encoder network being used.
+decoder_name: "pc_decoder"  # Name of the decoder network being used.
+posenet_name: "pose_net"  # Name of the pose prediction net.
+
+z_dim: 1024
+f_dim: 16
+fc_dim: 1024
+
+# Predict points
+pc_num_points: 8000
+pc_decoder_init_stddev: 0.025
+pc_point_dropout: 1.0
+pc_point_dropout_scheduled: true
+pc_point_dropout_exponential_schedule: false
+pc_point_dropout_end_step: 1.0
+pc_point_dropout_start_step: 0.0
+
+# Predict Pose
+predict_pose: false  # Predict camera pose instead of using ground truth.
+pose_quaternion: true  # Represent camera rotation as quaternion instead of matrix.
+
+pose_predict_num_candidates: 1
+pose_candidates_num_layers: 3
+pose_predictor_student: true
+pose_predictor_student_loss_weight: 1.0
+pose_student_spherical_loss: true
+pose_student_align_loss: false
+
+predict_translation: false
+predict_translation_scaling_factor: 0.15
+predict_translation_tanh: true
+predict_translation_init_stddev: 0.05
+
+# Points to grid conversion
+pc_relative_sigma: 1.0
+pc_relative_sigma_end: 0.2  # specify -1.0 for constant sigma
+pc_normalise_gauss: false
+pc_normalise_gauss_analytical: false
+pc_fix_bug_sigma: false
+pc_unit_cube: true
+pc_fast: true
+pc_gauss_kernel_size: 11
+pc_separable_gauss_filter: true
+pc_learn_occupancy_scaling: true
+pc_occupancy_scaling_maximum: 1.0
+
+# RGB
+pc_rgb: false
+pc_rgb_stop_points_gradient: false
+pc_clip_after_conv: false
+pc_do_not_clip: false
+pc_rgb_clip_after_conv: false
+pc_rgb_divide_by_occupancies: false
+pc_rgb_divide_by_occupancies_epsilon: 0.01
+pc_rgb_deep_decoder: false
+
+# deactivated experiments
+learn_focal_length: false
+focal_length_range: 1.0
+focal_length_mean: 2.0
+
+# voxel decoder (for baselines)
+decoder_conv_init_stdev: 0.02
+
+# Projection
+vox_size: 64  # Resolution of voxel grid.
+vox_size_z: -1  # Resolution of voxel grid along z.
+focal_length: 1.875  # Focal length parameter used in perspective projection.
+focal_range: 0.7  # Focal range parameter used in PTN.
+camera_distance: 2.0  # camera to object distance
+voxel_grid_size: 2.0  # used in PTN only
+ptn_max_projection: false  # Use max() function instead of DRC
+
+max_depth: 10.0
+max_dataset_depth: 10.0
+
+drc_logsum: true
+drc_logsum_clip_val: 0.00001
+drc_tf_cumulative: true
+
+# Loss
+pc_gauss_filter_gt: false
+pc_gauss_filter_gt_rgb: false
+pc_gauss_filter_gt_switch_off: false
+bicubic_gt_downsampling: false
+
+# Save options
+checkpoint_dir: "."  # Directory path for saving trained models and other data.
+
+# Execute
+gpu: 0  # GPU id
+gpu_allow_growth: false  # Don't allocate all GPU memory.
+per_process_gpu_memory_fraction: 1.0  # Fraction of GPU memory to allocate
+
+# Optimization
+step_size: 4  # Number of views per object in the batch.
+batch_size: 8  # Batch size while training.
+shuffle_batch: false  # Shuffle training samples.
+shuffle_dataset: false  # Shuffle training samples.
+proj_weight: 1.0  # Weighting factor for projection loss.
+drc_weight: 0.0  # Weighting factor for projection loss.
+proj_rgb_weight: 0.0  # Weighting factor for rgb projection loss.
+drc_rgb_weight: 0.0  # Weighting factor for rgb drc loss.
+proj_depth_weight: 0.0  # Weighting factor for depth proj loss.
+
+learning_rate: 0.0001  # Learning rate.
+learning_rate_step: 1.0  # Learning rate.
+learning_rate_2: 0.00001  # Learning rate.
+weight_decay: 0.001  # Weight decay parameter while training.
+clip_gradient_norm: 0.0  # Gradient clim norm, leave 0 if no gradient clipping.
+max_number_of_steps: 600000  # Maximum number of steps for training.
+compute_validation_loss: true
+variable_num_views: false
+
+save_snapshot_interval: -1
+validation_interval: 1000  # Do validation every so often.
+save_intermediate_pcs: false
+save_intermediate_pcs_interval: 5000
+save_early_frequent_snapshots: false
+
+master: ""  # The address of the tensorflow master
+
+save_summaries_secs: 120  # Seconds interval for dumping TF summaries.
+save_interval_secs: 300  # Seconds interval to save models.
+
+# Predict and visualise
+num_dataset_samples: -1
+save_predictions_dir: "pred"
+
+vis_threshold: 0.5  # voxel threshold for visualization
+vox_threshold: 0.5  # voxel threshold for evaluation
+vis_size: 128
+
+vis_voxels: false  # actually means visualize any 3D data
+vis_depth_projs: false
+vis_all_views: false
+align_to_canonical: false # apply rotation to bring to canonical orientation
+
+save_individual_images: false
+save_predictions: true  # Write predictions to disk
+save_voxels: false
+save_point_clouds: true
+save_as_mat: true
+save_rotated_points: false
+
+models_list: ""
+
+# Evaluate
+gt_pc_dir: ""
+eval_split: "val"  # on what subset to run evaluation: val, test or train
+pc_eval_chamfer_num_parts: 10
+eval_unsupervised_shape: false
+
+save_val_projection: false
+save_val_projection_dir: ""
+
+vox_marching_cubes_isosurface: 0.1
+vox_marching_cubes_dense: false
+
+pose_accuracy_threshold: 30.0  # In degrees
+
+# rendering point clouds in Blender
+vis_azimuth: 140.0  # In degrees
+vis_elevation: 15.0  # In degrees
+vis_dist: 2.0  # In degrees
+render_image_size: 256  # size of rendered image
+render_cycles_samples: 500  # number of samples in CYCLES renderer
+render_colored_subsets: false
