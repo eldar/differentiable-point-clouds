@@ -62,6 +62,10 @@ You can also generate ground truth yourself as described [here](dpc/densify/READ
 
 ### Train and Evaluate
 
+<p align="center">
+    <img src="resources/training.gif">
+</p>
+
 To train and evaluate the full model without camera pose supervision execute the following:
 
 ```bash
