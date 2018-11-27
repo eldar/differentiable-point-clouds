@@ -36,17 +36,13 @@ def pointcloud2voxels(cfg, input_pc, sigma):  # [B,N,3]
     sq_distance = tf.square(x_big - xg) + tf.square(y_big - yg) + tf.square(z_big - zg)
 
     # compute gaussian
-    if cfg.pc_fix_bug_sigma:
-        func = tf.exp(-sq_distance / (2.0 * sigma * sigma))  # [B,N,G,G,G]
-    else:
-        func = tf.exp(-sq_distance/(sigma*sigma))
+    func = tf.exp(-sq_distance / (2.0 * sigma * sigma))  # [B,N,G,G,G]
 
     # normalise gaussian
     if cfg.pc_normalise_gauss:
         normaliser = tf.reduce_sum(func, [2, 3, 4], keep_dims=True)
         func /= normaliser
     elif cfg.pc_normalise_gauss_analytical:
-        assert(cfg.pc_fix_bug_sigma)
         # should work with any grid sizes
         magic_factor = 1.78984352254  # see estimate_gauss_normaliser
         sigma_normalised = sigma * vox_size
@@ -67,7 +63,6 @@ def pointcloud2voxels3d_fast(cfg, pc, rgb):  # [B,N,3]
     else:
         vox_size_z = vox_size
 
-    filter_outsiders = True
     batch_size = pc.shape[0]
     num_points = tf.shape(pc)[1]
 
@@ -76,6 +71,7 @@ def pointcloud2voxels3d_fast(cfg, pc, rgb):  # [B,N,3]
     grid_size = 1.0
     half_size = grid_size / 2
 
+    filter_outliers = True
     valid = tf.logical_and(pc >= -half_size, pc <= half_size)
     valid = tf.reduce_all(valid, axis=-1)
 
@@ -94,14 +90,14 @@ def pointcloud2voxels3d_fast(cfg, pc, rgb):  # [B,N,3]
     r = pc_grid - indices_floor  # fractional part
     rr = [1.0 - r, r]
 
-    if filter_outsiders:
+    if filter_outliers:
         valid = tf.reshape(valid, [-1])
         indices = tf.boolean_mask(indices, valid)
 
     def interpolate_scatter3d(pos):
         updates_raw = rr[pos[0]][:, :, 0] * rr[pos[1]][:, :, 1] * rr[pos[2]][:, :, 2]
         updates = tf.reshape(updates_raw, [-1])
-        if filter_outsiders:
+        if filter_outliers:
             updates = tf.boolean_mask(updates, valid)
 
         indices_loc = indices
@@ -116,7 +112,7 @@ def pointcloud2voxels3d_fast(cfg, pc, rgb):  # [B,N,3]
                 updates_raw = tf.stop_gradient(updates_raw)
             updates_rgb = tf.expand_dims(updates_raw, axis=-1) * rgb
             updates_rgb = tf.reshape(updates_rgb, [-1, 3])
-            if filter_outsiders:
+            if filter_outliers:
                 updates_rgb = tf.boolean_mask(updates_rgb, valid)
             voxels_rgb = tf.scatter_nd(indices_loc, updates_rgb, [batch_size, vox_size_z, vox_size, vox_size, 3])
         else:
@@ -134,13 +130,7 @@ def pointcloud2voxels3d_fast(cfg, pc, rgb):  # [B,N,3]
                 voxels_rgb.append(vx_rgb)
 
     voxels = tf.add_n(voxels)
-
-    if has_rgb:
-        voxels_rgb = tf.add_n(voxels_rgb)
-        if not cfg.pc_rgb_clip_after_conv:
-            voxels_rgb = tf.clip_by_value(voxels_rgb, 0.0, 1.0)
-    else:
-        voxels_rgb = None
+    voxels_rgb = tf.add_n(voxels_rgb) if has_rgb else None
 
     return voxels, voxels_rgb
 
@@ -151,9 +141,6 @@ def smoothen_voxels3d(cfg, voxels, kernel):
             voxels = tf.nn.conv3d(voxels, krnl, [1, 1, 1, 1, 1], padding="SAME")
     else:
         voxels = tf.nn.conv3d(voxels, kernel, [1, 1, 1, 1, 1], padding="SAME")
-    if cfg.pc_clip_after_conv and not cfg.pc_do_not_clip:
-        print("clipping occupancies after convolution")
-        voxels = tf.clip_by_value(voxels, 0.0, 1.0)
     return voxels
 
 
@@ -249,12 +236,13 @@ def pointcloud_project_fast(cfg, point_cloud, transform, predicted_translation,
     voxels = tf.expand_dims(voxels, axis=-1)
     voxels_raw = voxels
 
-    if not cfg.pc_clip_after_conv and not cfg.pc_do_not_clip:
-        voxels = tf.clip_by_value(voxels, 0.0, 1.0)
+    voxels = tf.clip_by_value(voxels, 0.0, 1.0)
 
     if kernel is not None:
         voxels = smoothen_voxels3d(cfg, voxels, kernel)
         if has_rgb:
+            if not cfg.pc_rgb_clip_after_conv:
+                voxels_rgb = tf.clip_by_value(voxels_rgb, 0.0, 1.0)
             voxels_rgb = convolve_rgb(cfg, voxels_rgb, kernel)
 
     if scaling_factor is not None:

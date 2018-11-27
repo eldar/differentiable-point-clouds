@@ -4,7 +4,6 @@
 config: "" # .yaml config file
 
 inp_dir: ""  # Directory path containing the input data (tfrecords).
-dataset_name: "shapenet_single_category"  # Dataset name that is to be used for training and evaluation.
 synth_set: "03001627"  # Class of Shapenet data
 num_views: 5  # Number of viewpoints in the input data.
 num_views_to_use: -1  # Num of views to actually use.
@@ -12,7 +11,6 @@ tfrecords_gzip_compressed: true  # Compress TF record files.
 image_size: 128  # Input images dimension (pixels) - width & height.
 saved_camera: true
 saved_depth: false
-saved_voxels: false
 
 # Model general
 encoder_name: "img_encoder"  # Name of the encoder network being used.
@@ -40,7 +38,6 @@ pose_predict_num_candidates: 1
 pose_candidates_num_layers: 3
 pose_predictor_student: true
 pose_predictor_student_loss_weight: 1.0
-pose_student_spherical_loss: true
 pose_student_align_loss: false
 
 predict_translation: false
@@ -52,8 +49,7 @@ predict_translation_init_stddev: 0.05
 pc_relative_sigma: 1.0
 pc_relative_sigma_end: 0.2  # specify -1.0 for constant sigma
 pc_normalise_gauss: false
-pc_normalise_gauss_analytical: false
-pc_fix_bug_sigma: false
+pc_normalise_gauss_analytical: true
 pc_unit_cube: true
 pc_fast: true
 pc_gauss_kernel_size: 11
@@ -64,8 +60,6 @@ pc_occupancy_scaling_maximum: 1.0
 # RGB
 pc_rgb: false
 pc_rgb_stop_points_gradient: false
-pc_clip_after_conv: false
-pc_do_not_clip: false
 pc_rgb_clip_after_conv: false
 pc_rgb_divide_by_occupancies: false
 pc_rgb_divide_by_occupancies_epsilon: 0.01
@@ -129,16 +123,9 @@ max_number_of_steps: 600000  # Maximum number of steps for training.
 compute_validation_loss: true
 variable_num_views: false
 
-save_snapshot_interval: -1
 validation_interval: 1000  # Do validation every so often.
 save_intermediate_pcs: false
 save_intermediate_pcs_interval: 5000
-save_early_frequent_snapshots: false
-
-master: ""  # The address of the tensorflow master
-
-save_summaries_secs: 120  # Seconds interval for dumping TF summaries.
-save_interval_secs: 300  # Seconds interval to save models.
 
 # Predict and visualise
 num_dataset_samples: -1
