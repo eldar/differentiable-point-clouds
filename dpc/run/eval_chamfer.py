@@ -8,7 +8,7 @@ import numpy as np
 import scipy.io
 import tensorflow as tf
 
-from util.point_cloud import chamfer_distance
+from util.point_cloud import point_cloud_distance
 from util.simple_dataset import Dataset3D
 from util.app_config import config as app_config
 from util.tools import partition_range, to_np_object
@@ -52,7 +52,7 @@ def run_eval():
         target_pc = tf.placeholder(dtype=tf.float64, shape=[None, 3])
         quat_tf = tf.placeholder(dtype=tf.float64, shape=[1, 4])
 
-        _, min_dist, min_idx = chamfer_distance(source_pc, target_pc)
+        _, min_dist, min_idx = point_cloud_distance(source_pc, target_pc)
 
         source_pc_2 = tf.placeholder(dtype=tf.float64, shape=[1, None, 3])
         rotated_pc = quaternion_rotate(source_pc_2, quat_tf)

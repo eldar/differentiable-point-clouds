@@ -3,6 +3,9 @@ The code is written by Eldar Insafutdinov with the exception of the following mo
 dpc/densify
 The code for the dense sampling of points from ShapeNet CAD models is authored by Chen-Hsuan Lin
 
+dpc/util/point_cloud_distance.py
+The function for computing point to set distance is authored by Chen-Hsuan Lin
+
 dpc/render/
 The code for rendering point clouds is authored by Maxim Tatarchenko and Eldar Insafutdinov
 

@@ -4,6 +4,7 @@ import tensorflow as tf
 import util.drc
 from util.quaternion import quaternion_rotate
 from util.camera import intrinsic_matrix
+from util.point_cloud_distance import *
 
 
 def multi_expand(inp, axis, num):
@@ -316,19 +317,6 @@ def pc_point_dropout(points, rgb, keep_prob):
     else:
         out_rgb = None
     return out_points, out_rgb
-
-
-def chamfer_distance(Vs, Vt):
-    VsN = tf.shape(Vs)[0]
-    VtN = tf.shape(Vt)[0]
-    Vt_rep = tf.tile(Vt[None, :, :], [VsN, 1, 1])  # [VsN,VtN,3]
-    Vs_rep = tf.tile(Vs[:, None, :], [1, VtN, 1])  # [VsN,VtN,3]
-    diff = Vt_rep-Vs_rep
-    dist = tf.sqrt(tf.reduce_sum(diff**2, axis=[2]))  # [VsN,VtN]
-    idx = tf.to_int32(tf.argmin(dist, axis=1))
-    proj = tf.gather_nd(Vt_rep, tf.stack([tf.range(VsN), idx], axis=1))
-    minDist = tf.gather_nd(dist, tf.stack([tf.range(VsN), idx], axis=1))
-    return proj, minDist, idx
 
 
 def subsample_points(xyz, num_points):
