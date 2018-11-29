@@ -16,7 +16,7 @@ Create Python 3.6 environment (some packages are not yet available for the more 
 
 ```bash
 conda create -n py36 python=3.6
-source activate py36
+conda activate py36
 ```
 Install basic dependencies:
 
@@ -76,7 +76,7 @@ python ../../dpc/run/train_eval.py
 python ../../dpc/run/predict_eval.py --eval_split=test
 ```
 
-You can use a `--gpu` flag, to specify an ID of the GPU you want to run on.
+You can use a `--gpu` flag to specify an ID of the GPU you want to run on.
 
 The file `chamfer_pred_test.txt` contains the accuracy of 3D shape reconstruction represented by the two quantities: coverage and precision. Chamfer distance metric is the sum of precision and coverage. More details on the evaluation metric can be found in the [paper](https://arxiv.org/pdf/1810.09381.pdf#section.5). 
 
