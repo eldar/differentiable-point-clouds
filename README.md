@@ -2,7 +2,7 @@
 Eldar Insafutdinov and Alexey Dosovitskiy.  
 Neural Information Processing Systems, 2018.
 
-Website: https://eldar.github.io/PointClouds  
+Website: https://http://eldar.insafutdinov.com/PointClouds  
 Paper: https://arxiv.org/abs/1810.09381  
 
 ![Teaser Image](resources/overview.png)
